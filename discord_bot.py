@@ -1,6 +1,6 @@
 import os
 os.system("pip install discord.py")
-os.system("SpeechRecognition")
+os.system("pip install SpeechRecognition")
 import discord
 from discord.ext import commands
 import asyncio
