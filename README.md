@@ -1,270 +1,62 @@
-# PyCharacterAI
->
-> An asynchronous Python api wrapper for [Character AI](https://character.ai/) using [curl-cffi](https://github.com/yifeikong/curl_cffi).
+# Discord Character AI Voice Bot
 
-> [!WARNING]
-> This is an unofficial library made by an enthusiast who has no relation to the CharacterAI development team. CharacterAI has no official api and all breakpoints were found manually using reverse proxy. The author is not responsible for possible consequences of using this library.
->
-> The library is under constant development, trying to match the functionality of the website. Anything that isn't described in the documentation may be changed or removed without backward compatibility!
+## Description
+This Discord bot engages in voice conversations with users. It joins a voice channel, listens to a user's speech, converts it to text using Speech-to-Text (STT), sends the text to a Character AI persona, receives a text response, converts that response to speech using Character AI's voice generation, and plays it back in the voice channel. The bot supports a continuous conversation mode.
 
----
-📚 [Documentation](https://github.com/Xtr4F/PyCharacterAI/blob/main/docs/welcome.md).
+## Features
+- **Voice Conversations:** Enables spoken dialogue with a Character AI persona.
+- **Configurable Character:** Users can specify the Character AI token, character ID, and voice ID.
+- **Turn-Based Interaction:** The bot listens for a user's speech, responds, and then listens again.
+- **Conversation Management:** Commands to start, stop, and manage the conversation flow.
+- **Manual Recording:** Option for one-off voice recordings (when not in conversation mode).
 
----
-**TO-DO**:
+## Setup Instructions
 
-- [x] Exceptions.
-- [ ] Logging?
-- [ ] Finish the docs.
+### Prerequisites
+- **Python:** Python 3.8+ is recommended.
+- **FFmpeg:** FFmpeg must be installed and accessible in your system's PATH. FFmpeg is used for audio processing by `discord.py`. You can download it from [ffmpeg.org](https://ffmpeg.org/download.html).
 
----
-\
-If you have any questions, problems, suggestions, please open an issue or contact me:
+### Installation
+1.  **Clone the repository** (or download the files).
+2.  **Install Python dependencies:**
+    Create a `requirements.txt` file (or use the one provided) with the following content:
+    ```txt
+    discord.py
+    SpeechRecognition
+    # PyCharacterAI is assumed to be a local module present in the same directory.
+    # Pocketsphinx was installed as a dependency of SpeechRecognition for offline STT capabilities,
+    # but the bot primarily uses online STT (Google Web Speech API).
+    # curl-cffi was installed as a dependency of PyCharacterAI.
+    ```
+    Open your terminal or command prompt in the project directory and run:
+    ```bash
+    pip install -r requirements.txt
+    ```
+    If `PyCharacterAI` is not provided as a local module, you would typically install it via pip if it were available on PyPI (e.g., `pip install PyCharacterAI`). For this project, ensure the `pycharacterai` library/module is correctly placed if it's a local dependency.
 
-[![Tag](https://img.shields.io/badge/telegram-dm-black?style=flat&logo=Telegram)](https://t.me/XtraF)
+3.  **Configuration:**
+    Open the `discord_bot.py` file in a text editor. At the top of the file, you will find placeholder values for your tokens and IDs. **You MUST replace these with your actual credentials:**
+    ```python
+    CAI_TOKEN = "YOUR_CAI_TOKEN"  # Your Character AI client token
+    CAI_CHARACTER_ID = "YOUR_CAI_CHARACTER_ID" # The ID of the Character AI you want to use
+    CAI_VOICE_ID = "YOUR_CAI_VOICE_ID" # The voice ID for the character's speech
+    BOT_TOKEN = "YOUR_DISCORD_BOT_TOKEN" # Your Discord bot token
+    ```
 
----
-
-## Getting started
-
-First, you need to install the library:
-
+## Running the Bot
+Once the dependencies are installed and the configuration is set, you can run the bot using:
 ```bash
-pip install PyCharacterAI
+python discord_bot.py
 ```
+Ensure your terminal is in the same directory as `discord_bot.py`.
 
----
-\
-Import the `Client` class from the library and create a new instance of it:
-
-```Python
-from PyCharacterAI import Client
-```
-
-```Python
-client = Client()
-```
-
-Then you need to authenticate `client` using `token`:
-
-```Python
-await client.authenticate("TOKEN")
-```
-
-> if you want to be able to upload your avatar you also need to specify `web_next_auth` token as an additional argument (only this way for now, this may change in the future):
->
-> ```Python
-> await client.authenticate("TOKEN", web_next_auth="WEB_NEXT_AUTH")
-> ```
-
-\
-Or you can just call `get_client()` method:
-
-```Python
-from PyCharacterAI import get_client
-
-client = await get_client(token="TOKEN", web_next_auth="WEB_NEXT_AUTH")
-```
-
-After authentication, we can use all available library methods.
+## Usage / Commands
+-   **`!join`**: The bot will join the voice channel you are currently in and initiate "conversation mode." It will listen for your speech for 10 seconds, process it, get a response from Character AI, speak it back, and then listen to you again.
+-   **`!stopconvo`**: This command stops the active "conversation mode." The bot will stop listening, clear any ongoing processes, and leave the voice channel.
+-   **`!leave`**: Similar to `!stopconvo`, this command makes the bot leave the voice channel and ends any active conversation mode.
+-   **`!record`**: If conversation mode is *not* active, you can use this command to make a manual 10-second recording of your voice. The bot will process this single recording (STT and Character AI response if configured, though playback might only be the text part depending on implementation details outside conversation mode).
 
 ---
 
-## About tokens and how to get them
->
-> ⚠️ WARNING, DO NOT SHARE THESE TOKENS WITH ANYONE! Anyone with your tokens has full access to your account!
-
-This library uses two types of tokens: a common `token` and `web_next_auth`. The first one is required for almost all methods here and the second one only and only for `upload_avatar()` method (may change in the future).
-
-### Instructions for getting a `token`
-
-1. Open the Character.AI website in your browser
-2. Open the `developer tools` (`F12`, `Ctrl+Shift+I`, or `Cmd+J`)
-3. Go to the `Nerwork` tab
-4. Interact with website in some way, for example, go to your profile and look for `Authorization` in the request header
-5. Copy the value after `Token`
-
-> For example, token in `https://plus.character.ai/chat/user/public/following/` request headers:
-> ![img](https://github.com/Xtr4F/PyCharacterAI/blob/main/assets/token.png)
-
-### Instructions for getting a `web_next_auth` token
-
-1. Open the Character.AI website in your browser
-2. Open the `developer tools` (`F12`, `Ctrl+Shift+I`, or `Cmd+J`)
-3. Go to the `Storage` section and click on `Cookies`
-4. Look for the `web-next-auth` key
-5. Copy its value
-
-> ![img](https://github.com/Xtr4F/PyCharacterAI/blob/main/assets/web_next_auth.png)
-
----
-
-## Examples
->
-> Here are just some examples of the library's features. If you want to know about all `methods` and `types` with explanations, go to [methods](https://github.com/Xtr4F/PyCharacterAI/blob/main/docs/api_reference/methods.md) and [types](https://github.com/Xtr4F/PyCharacterAI/blob/main/docs/api_reference/types.md) documentation sections.
->
-### Simple chatting example
-
-```Python
-import asyncio
-
-from PyCharacterAI import get_client
-from PyCharacterAI.exceptions import SessionClosedError
-
-token = "TOKEN"
-character_id = "ID"
-
-
-async def main():
-    client = await get_client(token=token)
-
-    me = await client.account.fetch_me()
-    print(f"Authenticated as @{me.username}")
-
-    chat, greeting_message = await client.chat.create_chat(character_id)
-
-    print(f"{greeting_message.author_name}: {greeting_message.get_primary_candidate().text}")
-
-    try:
-        while True:
-            # NOTE: input() is blocking function!
-            message = input(f"[{me.name}]: ")
-
-            answer = await client.chat.send_message(character_id, chat.chat_id, message)
-            print(f"[{answer.author_name}]: {answer.get_primary_candidate().text}")
-
-    except SessionClosedError:
-        print("session closed. Bye!")
-
-    finally:
-        # Don't forget to explicitly close the session
-        await client.close_session()
-
-asyncio.run(main())
-```
-
----
-
-A more advanced example. You can use so-called streaming to receive a message in parts, as is done on a website, instead of waiting for it to be completely generated:
-
-```Python
-import asyncio
-
-from PyCharacterAI import get_client
-from PyCharacterAI.exceptions import SessionClosedError
-
-token = "TOKEN"
-character_id = "ID"
-
-
-async def main():
-    client = await get_client(token=token)
-
-    me = await client.account.fetch_me()
-    print(f'Authenticated as @{me.username}')
-
-    chat, greeting_message = await client.chat.create_chat(character_id)
-
-    print(f"[{greeting_message.author_name}]: {greeting_message.get_primary_candidate().text}")
-
-    try:
-        while True:
-            # NOTE: input() is blocking function!
-            message = input(f"[{me.name}]: ")
-
-            answer = await client.chat.send_message(character_id, chat.chat_id, message, streaming=True)
-
-            printed_length = 0
-            async for message in answer:
-                if printed_length == 0:
-                    print(f"[{message.author_name}]: ", end="")
-
-                text = message.get_primary_candidate().text
-                print(text[printed_length:], end="")
-
-                printed_length = len(text)
-            print("\n")
-
-    except SessionClosedError:
-        print("session closed. Bye!")
-
-    finally:
-        # Don't forget to explicitly close the session
-        await client.close_session()
-
-asyncio.run(main())
-```
-
----
-
-### Working with images
-
-```Python
-# We can generate images from a prompt
-# (It will return list of urls)
-images = await client.utils.generate_image("prompt")
-```
-
----
-
-```Python
-# We can upload an image to use it as an 
-# avatar for character/persona/profile
-
-# NOTE: This method requires the specified web_next_auth token
-avatar_file = "path to file or url"
-avatar = await client.utils.upload_avatar(avatar_file)
-```
-
----
-
-### Working with voices
-
-```Python
-# We can search for voices
-voices = await client.utils.search_voices("name")
-```
-
----
-
-```Python
-# We can upload the audio as a voice
-voice_file = "path to file or url"
-voice = await client.utils.upload_voice(voice_file, "voice name")
-```
-
----
-
-```Python
-# We can set and unset a voice for character  
-await client.account.set_voice("character_id", "voice_id")
-await client.account.unset_voice("character_id")
-```
-
----
-
-```Python
-# And we can use voice to generate speech from the character's messages
-speech = await client.utils.generate_speech("chat_id", "turn_id", "candidate_id", "voice_id")
-
-# It will return bytes, so we can use it for example like this:
-filepath = "voice.mp3"
-
-with open(filepath, 'wb') as f:
-  f.write(speech)
-```
-
-```Python
-# or we can get just the url.
-speech_url = await client.utils.generate_speech("chat_id", "turn_id", "candidate_id", 
-                                            "voice_id", return_url=True)
-
-```
-
----
-
-## Special Thanks
-
-- [node_characterai](https://github.com/realcoloride/node_characterai) by @realcoloride - for being the backbone of the project in the past.
-
-- [CharacterAI](https://github.com/kramcat/CharacterAI) by @kramcat - for inspiring me.
+*This bot relies on external services (SpeechRecognition for STT, Character AI for persona and TTS). Ensure you have stable internet access and that these services are operational.*
+*Ensure FFmpeg is correctly installed and added to your system's PATH.*
