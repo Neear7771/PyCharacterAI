@@ -44,11 +44,30 @@ This Discord bot engages in voice conversations with users. It joins a voice cha
     ```
 
 ## Running the Bot
-Once the dependencies are installed and the configuration is set, you can run the bot using:
-```bash
-python discord_bot.py
-```
-Ensure your terminal is in the same directory as `discord_bot.py`.
+
+There are two main ways to run the bot:
+
+**1. Using the startup script (recommended for Linux/macOS):**
+
+   Make the script executable (only needs to be done once):
+   ```bash
+   chmod +x run_bot.sh
+   ```
+   Then run the script:
+   ```bash
+   ./run_bot.sh
+   ```
+   Alternatively, you can run it directly with bash:
+   ```bash
+   bash run_bot.sh
+   ```
+
+**2. Directly with Python:**
+
+   You can also run the bot directly using Python (ensure you are in the project's root directory and use `python3` as specified in the `run_bot.sh` script):
+   ```bash
+   python3 discord_bot.py
+   ```
 
 ## Usage / Commands
 -   **`!join`**: The bot will join the voice channel you are currently in and initiate "conversation mode." It will listen for your speech for 10 seconds, process it, get a response from Character AI, speak it back, and then listen to you again.

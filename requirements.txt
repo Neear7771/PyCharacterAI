@@ -1,6 +1,5 @@
 discord.py
 SpeechRecognition
-websockets==15.0.1
 # PyCharacterAI is a local module, not from PyPI, but its dependencies like curl-cffi might be needed if installing from scratch.
 # Pocketsphinx was installed as a dependency of SpeechRecognition for offline STT capabilities.
 # SoundDevice was installed as a dependency of Pocketsphinx.

@@ -8,10 +8,11 @@ from io import BytesIO # For handling byte streams (audio data)
 
 # --- Configuration Placeholders ---
 # These MUST be filled in for the bot to work.
-CAI_TOKEN = "8041baf6512c863ffe65eea49a071e4f0287f149"  # Your Character AI client token
-CAI_CHARACTER_ID = "vOPdHXLGkA_7tamhZGhijCC29nk8W1xphYbm81qfSH4" # The ID of the Character AI character you want to interact with
-CAI_VOICE_ID = "453c0918-82d5-40ab-b42c-517a322ee5e5" # The specific voice ID for the Character AI character's speech
-BOT_TOKEN = input("BOT TOKEN: ") 
+CAI_TOKEN = "YOUR_CAI_TOKEN"  # Your Character AI client token
+CAI_CHARACTER_ID = "YOUR_CAI_CHARACTER_ID" # The ID of the Character AI character you want to interact with
+CAI_VOICE_ID = "YOUR_CAI_VOICE_ID" # The specific voice ID for the Character AI character's speech
+BOT_TOKEN = "YOUR_DISCORD_BOT_TOKEN" # Your Discord bot token
+
 # --- Global Variables ---
 cai_client = None # Global client for PyCharacterAI, initialized in on_ready()
 conversation_mode_status = {} # Dictionary to manage conversation mode state per guild
