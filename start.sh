@@ -4,4 +4,4 @@ echo "Installing dependencies..."
 pip install -r requirements.txt --user
 
 echo "Starting bot..."
-python test.py
+python discord_bot.py
