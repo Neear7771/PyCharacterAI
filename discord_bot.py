@@ -1,5 +1,5 @@
 import os
-os.system("pip install discord.py")
+os.system("pip install discord")
 os.system("pip install SpeechRecognition")
 import discord
 from discord.ext import commands
