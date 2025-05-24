@@ -1,7 +1,3 @@
-import os
-os.system("pip install discord.py")
-os.system("SpeechRecognition") 
-#os.system("websockets==15.0.1") 
 import discord
 from discord.ext import commands
 import asyncio
@@ -12,10 +8,11 @@ from io import BytesIO # For handling byte streams (audio data)
 
 # --- Configuration Placeholders ---
 # These MUST be filled in for the bot to work.
-CAI_TOKEN = "8041baf6512c863ffe65eea49a071e4f0287f149"  # Your Character AI client token
-CAI_CHARACTER_ID = "vOPdHXLGkA_7tamhZGhijCC29nk8W1xphYbm81qfSH4" # The ID of the Character AI character you want to interact with
-CAI_VOICE_ID = "453c0918-82d5-40ab-b42c-517a322ee5e5" # The specific voice ID for the Character AI character's speech
-BOT_TOKEN = input("BOT TOKEN:") 
+CAI_TOKEN = "YOUR_CAI_TOKEN"  # Your Character AI client token
+CAI_CHARACTER_ID = "YOUR_CAI_CHARACTER_ID" # The ID of the Character AI character you want to interact with
+CAI_VOICE_ID = "YOUR_CAI_VOICE_ID" # The specific voice ID for the Character AI character's speech
+BOT_TOKEN = "YOUR_DISCORD_BOT_TOKEN" # Your Discord bot token
+
 # --- Global Variables ---
 cai_client = None # Global client for PyCharacterAI, initialized in on_ready()
 conversation_mode_status = {} # Dictionary to manage conversation mode state per guild
@@ -239,11 +236,14 @@ async def start_recording(
         # Start listening for audio.
         # `voice_client.listen()` takes the sink and an `after` callback.
         # The `after` callback (`finished_recording_callback`) is triggered when `voice_client.stop_listening()` is called.
-        # We pass `guild`, `user_to_record`, and `text_channel_for_responses` as `*cb_args` (callback arguments)
-        # so that `finished_recording_callback` receives the necessary context for its operations.
-        voice_client.listen(sink_instance, 
-                            after=lambda sink_obj, *cb_args: bot.loop.create_task(finished_recording_callback(sink_obj, *cb_args)), 
-                            guild, user_to_record, text_channel_for_responses)
+        # We pass `guild`, `user_to_record`, and `text_channel_for_responses` as positional arguments to listen(),
+        # which then passes them to the `after` callback.
+        voice_client.listen(sink_instance,
+                            guild,
+                            user_to_record,
+                            text_channel_for_responses,
+                            after=lambda sink_param, guild_param, user_param, channel_param: bot.loop.create_task(finished_recording_callback(sink_param, guild_param, user_param, channel_param))
+                           )
         
         await text_channel_for_responses.send(f"Listening to {user_to_record.mention} for 10 seconds...")
         await asyncio.sleep(10) # Record audio for a fixed duration of 10 seconds.
@@ -407,9 +407,13 @@ async def record(ctx: commands.Context):
     sink_instance = discord.sinks.WaveSink() # Create a new sink for this recording session.
     try:
         # Pass guild, author, and channel to the callback via listen's *args for context.
-        ctx.voice_client.listen(sink_instance, 
-                                after=lambda sink, *args: bot.loop.create_task(finished_recording_callback(sink, *args)),
-                                ctx.guild, ctx.author, ctx.channel)
+        # Corrected: Positional arguments must come before keyword arguments.
+        ctx.voice_client.listen(sink_instance,
+                               ctx.guild,
+                               ctx.author,
+                               ctx.channel,
+                               after=lambda sink_param, guild_param, user_param, channel_param: bot.loop.create_task(finished_recording_callback(sink_param, guild_param, user_param, channel_param))
+                              )
         await asyncio.sleep(10) # Record for 10 seconds.
     except Exception as e:
         print(f"Error starting manual recording listener: {e}")
